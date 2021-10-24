@@ -3,14 +3,6 @@
 <html>
 <%-- header --%>
 <%@include file="common/header.jsp"%>
-<%
-    File dir = new File("C:\\Users\\gaeun\\IdeaProjects\\kmapp_web\\src\\main\\resources\\static\\images");
-    File files[] = dir.listFiles();
-
-    for (int i = 0; i < files.length; i++) {
-        System.out.println(files[i]);
-    }
-%>
 
 <body>
     <!-- wrap -->
@@ -86,6 +78,8 @@
                         </div>
                         <div class="btn-wrap">
                             <button type="button" class="btn-large btn-blue" id="btnImgSearch">예측자료 생산</button>
+                            <button type="button" class="btn-large btn-blue" id="btnTest">파일 경로보기</button>
+
                         </div>
                     </div>
 
@@ -435,6 +429,7 @@
                     <div class="tit-wrap">
                         <h2>예측자료 생산 진행상황</h2>
                         <button type="button" class="modal-close" data-dismiss="modal"><img src="resources/img/ico/btn-gnb-close.svg" alt=""></button>
+                        <button type="button" class="modal-close" data-dismiss="modal"><img src="resources/images/20211011/123456789/Busan_downward_SW_flux_surface_dnsc_SWDN_004.nc.1631675708.png" alt=""></button>
                     </div>
                     <div class="modal-body-scroll">
                         <ul class="log-list">

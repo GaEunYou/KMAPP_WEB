@@ -4,7 +4,7 @@ let _MIN_DATE_ = '';
 let _MAX_DATE_ = '';
 let _MIN_INFO_ = '';
 let _MAX_INFO_ = '';
-let _arrayImage = new Array();
+let _arrayImage = [];
 
 // 예측 파일 생성 로그
 function getFileLogInfo() {
@@ -68,8 +68,10 @@ function getFileLogInfo() {
 
 // 결과 이미지 셋팅
 function setImage() {
-    $('#resultImage').empty();
-    $('#resultImage').append('<div class="map-thumb img-dnsc" style="display:none;"><img src="'+  +'" onclick="javascript:imgPopup(this);"></div>');
+    for (i=0; i<_arrayImage.length; i++){
+        $('#resultImage').empty();
+        $('#resultImage').append('<div class="map-thumb img-dnsc" style="display:none;"><img src="'+ _arrayImage[i] +'" onclick="javascript:imgPopup(this);"></div>');
+    }
 }
 
 // 예측 자료 생산
@@ -141,7 +143,6 @@ function search() {
     //로그모달 표출
     $('#logModal').modal({backdrop: 'static', keyboard: false});
 
-
     $.ajax({
         type: 'post',
         url: 'http://192.168.1.237:9000/kmappApi/pred/produce/surf',
@@ -205,6 +206,33 @@ function predDateInfo() {
     });
 }
 
+function getImgList(path) {
+    $.ajax({
+        type: 'get',
+        url: 'http://localhost:9100/imgFind?path=' + path,
+        success : function (data) {
+            $('#resultImage').empty();
+            console.log(data);
+            _arrayImage = data;
+            for (let i=0; i<_arrayImage.length; i++){
+                $('#resultImage').append('<div class="map-thumb img-dnsc" style="display: none;"><img src="' + _arrayImage[i].path + '" onclick="javascript:imgPopup(this);"></div>');
+                $('#baseDate').text($('#predDate').val() + ' ' + $('#predTime').val());
+                $('#imageBox').css('display', 'none');
+                $('#resultImage').css('display', 'block');
+            }
+        },
+        error: function (error) {
+            console.log(error.responseText);
+        }
+    });
+    let result = "";
+    return result;
+}
+// 테스트
+$('#btnTest').click(function () {
+    getImgList("images/20211011/123456789");
+});
+
 // 예측자료생산 버튼 클릭 이벤트
 $('#btnImgSearch').click(function () {
     search();
@@ -217,23 +245,31 @@ $('#btnDraw').click(function() {
 
 // 메뉴얼보기 버튼 클릭 이벤트
 $('.btn_manual').click(function() {
-    popupCenter('common/img/thumb/dnsc_manual.pdf', 'DNSC Manual', '1200', '800');
+    popupCenter('resources/img/thumb/dnsc_manual.pdf', 'DNSC Manual', '1200', '800');
 });
 
 // 초기화 버튼 클릭 이벤트
+$('#btnReset').click(function () {
+    $('#color option:eq(0)').prop("selected", true);
+    $('#vstep').val('');
+    $('#vmin').val('');
+    $('#vmax').val('');
+    $('#legendSize option:eq(0)').prop("selected", true);
+    $('#legendPosition option:eq(0)').prop("selected", true);
+});
 
 // 이미지 다운로드 버튼 클릭 이벤트
-$('#btnDataDown').click(function(event) { //예측영역, 예측영역(서울) 이미지 모두 다운로드 되어야 한다...
+$('#btnDataDown').click(function(event) {
     let imgSrc, tokens;
 
-    if(document.getElementById('imageList1').children.length == 0) {
-        imgSrc = document.getElementById('imageBox1').firstElementChild.getAttribute('src');
+    if(document.getElementById('resultImage').children.length == 0) {
+        imgSrc = document.getElementById('resultImage').firstElementChild.getAttribute('src');
         tokens = imgSrc.split('/');
         saveToDisk(imgSrc, tokens[tokens.length - 1]);
         return;
     }
 
-    imgSrc = document.getElementById('imageList1').children[_IMG_IDX_].firstElementChild.getAttribute('src');
+    imgSrc = document.getElementById('resultImage').children[_IMG_IDX_].firstElementChild.getAttribute('src');
     console.log(imgSrc);
     tokens = imgSrc.split('/');
     saveToDisk(imgSrc, tokens[tokens.length - 1]);
@@ -253,12 +289,12 @@ $('.btn_controller_next').on('click', function(e) {
 $('.slide-play-btn').on('click', function(e) {
     if( $('.slide-play-btn').hasClass('active') ) {
         $('.slide-play-btn').removeClass('active');
-        $('.slide-play-btn img').attr('src', 'common/img/ico/btn_controller_play2.gif');
+        $('.slide-play-btn img').attr('src', 'resources/img/ico/btn_controller_play2.gif');
         clearInterval(imageTimer);
 
     } else {
         $('.slide-play-btn').addClass('active');
-        $('.slide-play-btn img').attr('src', 'common/img/ico/btn_controller_stop2.gif');
+        $('.slide-play-btn img').attr('src', 'resources/img/ico/btn_controller_stop2.gif');
 
         imageTimer = setInterval("playImage()", 500);
     }
@@ -310,7 +346,6 @@ function viewImg(idx) {
     $('.img-dnsc').css('display', 'none');
 
     document.getElementById('resultImage').children[idx + 1].style.display = 'block';
-    //document.getElementById('imageList2').children[idx + 1].style.display = 'block';
 
     _IMG_IDX_ = idx;
     viewTm(idx, 1);
