@@ -225,8 +225,6 @@ function getImgList(path) {
             console.log(error.responseText);
         }
     });
-    let result = "";
-    return result;
 }
 // 테스트
 $('#btnTest').click(function () {
